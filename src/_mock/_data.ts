@@ -9,6 +9,7 @@ import {
   _postTitles,
   _description,
   _productNames,
+  _productDescription,
 } from './_mock';
 
 // ----------------------------------------------------------------------
@@ -24,7 +25,7 @@ export const _myAccount = {
 export const _users = [...Array(24)].map((_, index) => ({
   id: _id(index),
   name: _fullName(index),
-  company: _company(index),
+  // company: _company(index),
   isVerified: _boolean(index),
   avatarUrl: `/assets/images/avatar/avatar-${index + 1}.webp`,
   status: index % 4 ? 'active' : 'banned',
@@ -81,6 +82,7 @@ export const _products = [...Array(24)].map((_, index) => {
     id: _id(index),
     price: _price(index),
     name: _productNames(index),
+    description : _productDescription(index),
     priceSale: setIndex % 3 ? null : _price(index),
     coverUrl: `/assets/images/product/product-${setIndex}.webp`,
     colors:

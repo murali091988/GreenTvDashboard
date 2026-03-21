@@ -1,152 +1,342 @@
-import { useState, useCallback } from 'react';
+import type { DragEvent, ChangeEvent } from "react";
 
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Pagination from '@mui/material/Pagination';
-import Typography from '@mui/material/Typography';
+import React, { useRef, useState } from "react";
 
-import { _products } from 'src/_mock';
-import { DashboardContent } from 'src/layouts/dashboard';
-
-import { ProductItem } from '../product-item';
-import { ProductSort } from '../product-sort';
-import { CartIcon } from '../product-cart-widget';
-import { ProductFilters } from '../product-filters';
-
-import type { FiltersProps } from '../product-filters';
-
-// ----------------------------------------------------------------------
-
-const GENDER_OPTIONS = [
-  { value: 'men', label: 'Men' },
-  { value: 'women', label: 'Women' },
-  { value: 'kids', label: 'Kids' },
-];
-
-const CATEGORY_OPTIONS = [
-  { value: 'all', label: 'All' },
-  { value: 'shose', label: 'Shose' },
-  { value: 'apparel', label: 'Apparel' },
-  { value: 'accessories', label: 'Accessories' },
-];
-
-const RATING_OPTIONS = ['up4Star', 'up3Star', 'up2Star', 'up1Star'];
-
-const PRICE_OPTIONS = [
-  { value: 'below', label: 'Below $25' },
-  { value: 'between', label: 'Between $25 - $75' },
-  { value: 'above', label: 'Above $75' },
-];
-
-const COLOR_OPTIONS = [
-  '#00AB55',
-  '#000000',
-  '#FFFFFF',
-  '#FFC0CB',
-  '#FF4842',
-  '#1890FF',
-  '#94D82D',
-  '#FFC107',
-];
-
-const defaultFilters = {
-  price: '',
-  gender: [GENDER_OPTIONS[0].value],
-  colors: [COLOR_OPTIONS[4]],
-  rating: RATING_OPTIONS[0],
-  category: CATEGORY_OPTIONS[0].value,
-};
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import {
+  Box,
+  Card,
+  Button,
+  TextField,
+  Typography,
+  CardContent,
+  LinearProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Tabs,
+  Tab,
+} from "@mui/material";
 
 export function ProductsView() {
-  const [sortBy, setSortBy] = useState('featured');
+  const [mediaType, setMediaType] = useState<"video" | "audio">("video");
 
-  const [openFilter, setOpenFilter] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
-  const [filters, setFilters] = useState<FiltersProps>(defaultFilters);
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [thumbPreview, setThumbPreview] = useState<string | null>(null);
 
-  const handleOpenFilter = useCallback(() => {
-    setOpenFilter(true);
-  }, []);
+  const [menu, setMenu] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
 
-  const handleCloseFilter = useCallback(() => {
-    setOpenFilter(false);
-  }, []);
+  const [progress, setProgress] = useState<number>(0);
 
-  const handleSort = useCallback((newSort: string) => {
-    setSortBy(newSort);
-  }, []);
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const thumbRef = useRef<HTMLInputElement | null>(null);
 
-  const handleSetFilters = useCallback((updateState: Partial<FiltersProps>) => {
-    setFilters((prevValue) => ({ ...prevValue, ...updateState }));
-  }, []);
+  // 🎯 Handle Media
+  const handleMedia = (selectedFile?: File | null) => {
+    if (!selectedFile) return;
 
-  const canReset = Object.keys(filters).some(
-    (key) => filters[key as keyof FiltersProps] !== defaultFilters[key as keyof FiltersProps]
-  );
+    if (mediaType === "video" && !selectedFile.type.startsWith("video/")) {
+      alert("Upload valid video");
+      return;
+    }
+
+    if (mediaType === "audio" && !selectedFile.type.startsWith("audio/")) {
+      alert("Upload valid audio");
+      return;
+    }
+
+    // 🧹 cleanup old preview (important)
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+
+    const previewUrl = URL.createObjectURL(selectedFile);
+
+    setFile(selectedFile);
+    setPreview(previewUrl);
+  };
+
+  const handleThumbnail = (selectedFile?: File | null) => {
+    if (!selectedFile) return;
+
+    if (!selectedFile.type.startsWith("image/")) {
+      alert("Upload valid image");
+      return;
+    }
+
+    if (thumbPreview) {
+      URL.revokeObjectURL(thumbPreview);
+    }
+
+    const previewUrl = URL.createObjectURL(selectedFile);
+
+    setThumbnail(selectedFile);
+    setThumbPreview(previewUrl);
+  };
+  // Switch Media Type
+  const handleTabChange = (_: any, value: "video" | "audio") => {
+    setMediaType(value);
+
+    // Remove thumbnail if audio
+    if (value === "audio") {
+      setThumbnail(null);
+      setThumbPreview(null);
+    }
+
+    // Reset media
+    setFile(null);
+    setPreview(null);
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    handleMedia(e.dataTransfer.files[0]);
+  };
 
   return (
-    <DashboardContent>
-      <CartIcon totalItems={8} />
+    <Box
+      sx={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #eef2ff, #f8fafc)",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        p: 2,
+      }}
+    >
+      <Card sx={{ width: 700, borderRadius: 4, boxShadow: 6 }}>
+        <CardContent>
+          <Typography variant="h5" fontWeight="bold">
+            Upload Media 🎬🎵
+          </Typography>
 
-      <Typography variant="h4" sx={{ mb: 5 }}>
-        Products
-      </Typography>
-      <Box
-        sx={{
-          mb: 5,
-          display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap-reverse',
-          justifyContent: 'flex-end',
-        }}
-      >
-        <Box
-          sx={{
-            my: 1,
-            gap: 1,
-            flexShrink: 0,
-            display: 'flex',
-          }}
-        >
-          <ProductFilters
-            canReset={canReset}
-            filters={filters}
-            onSetFilters={handleSetFilters}
-            openFilter={openFilter}
-            onOpenFilter={handleOpenFilter}
-            onCloseFilter={handleCloseFilter}
-            onResetFilter={() => setFilters(defaultFilters)}
-            options={{
-              genders: GENDER_OPTIONS,
-              categories: CATEGORY_OPTIONS,
-              ratings: RATING_OPTIONS,
-              price: PRICE_OPTIONS,
-              colors: COLOR_OPTIONS,
+          {/*MEDIA TYPE TABS */}
+          <Tabs
+            value={mediaType}
+            onChange={handleTabChange}
+            centered
+            sx={{
+              mt: 2,
+              "& .MuiTab-root": {
+                fontSize: "16px",   
+                fontWeight: 600,
+                minHeight: 60,      
+                padding: "12px 24px",
+              },
             }}
-          />
+          >
+            <Tab label="Video 🎬" value="video" />
+            <Tab label="Audio 🎵" value="audio" />
+          </Tabs>
 
-          <ProductSort
-            sortBy={sortBy}
-            onSort={handleSort}
-            options={[
-              { value: 'featured', label: 'Featured' },
-              { value: 'newest', label: 'Newest' },
-              { value: 'priceDesc', label: 'Price: High-Low' },
-              { value: 'priceAsc', label: 'Price: Low-High' },
-            ]}
-          />
-        </Box>
-      </Box>
+          {/* UPLOAD */}
+          <Box
+            mt={2}
+            onDrop={handleDrop}
+            onDragOver={(e) => e.preventDefault()}
+            onClick={() => fileRef.current?.click()}
+            sx={{
+              border: "2px dashed #6366f1",
+              borderRadius: 3,
+              p: 3,
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            <CloudUploadIcon sx={{ fontSize: 40 }} />
+            <Typography>
+              Upload {mediaType === "video" ? "Video" : "Audio"}
+            </Typography>
 
-      <Grid container spacing={3}>
-        {_products.map((product) => (
-          <Grid key={product.id} size={{ xs: 12, sm: 6, md: 3 }}>
-            <ProductItem product={product} />
-          </Grid>
-        ))}
-      </Grid>
+            <input
+              ref={fileRef}
+              type="file"
+              hidden
+              accept={mediaType === "video" ? "video/*" : "audio/*"}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                handleMedia(e.target.files?.[0])
+              }
+            />
+          </Box>
 
-      <Pagination count={10} color="primary" sx={{ mt: 8, mx: 'auto' }} />
-    </DashboardContent>
+          {/* PREVIEW */}
+          {preview && (
+            <Box mt={2}>
+              {mediaType === "video" ? (
+                <video width="100%" controls style={{ borderRadius: 10 }}>
+                  <source src={preview} />
+                </video>
+              ) : (
+                <audio controls style={{ width: "100%" }}>
+                  <source src={preview} />
+                </audio>
+              )}
+            </Box>
+          )}
+
+          {/* THUMBNAIL (ONLY VIDEO) */}
+          {mediaType === "video" && (
+            <Box mt={3}>
+              <Typography fontWeight="bold" mb={1}>
+                Thumbnail
+              </Typography>
+
+              <Box
+                onClick={() => thumbRef.current?.click()}
+                onDrop={(e: DragEvent<HTMLDivElement>) => {
+                  e.preventDefault();
+                  handleThumbnail(e.dataTransfer.files[0]);
+                }}
+                onDragOver={(e) => e.preventDefault()}
+                sx={{
+                  border: "2px dashed #10b981",
+                  borderRadius: 3,
+                  p: 2,
+                  textAlign: "center",
+                  cursor: "pointer",
+                  position: "relative",
+                  height: 180,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#f9fafb",
+                }}
+              >
+                {!thumbPreview ? (
+                  <Typography color="text.secondary">
+                    Click or Drag image here
+                  </Typography>
+                ) : (
+                  <>
+                    <img
+                      src={thumbPreview}
+                      alt="thumbnail"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: 8,
+                      }}
+                    />
+
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 10,
+                        right: 10,
+                        display: "flex",
+                        gap: 1,
+                      }}
+                    >
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          thumbRef.current?.click();
+                        }}
+                      >
+                        Change
+                      </Button>
+
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setThumbnail(null);
+                          setThumbPreview(null);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </Box>
+                  </>
+                )}
+
+                <input
+                  ref={thumbRef}
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    handleThumbnail(e.target.files?.[0])
+                  }
+                />
+              </Box>
+            </Box>
+          )}
+
+          {/* MENU */}
+          <Box mt={3}>
+            <FormControl fullWidth>
+              <InputLabel>Menu</InputLabel>
+              <Select
+                value={menu}
+                label="Menu"
+                onChange={(e) => setMenu(e.target.value)}
+              >
+                <MenuItem value="">Select Menu</MenuItem>
+                <MenuItem value="LiveTv">LiveTv</MenuItem>
+                <MenuItem value="Podcast">Podcast</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* CATEGORY */}
+          <Box mt={3}>
+            <FormControl fullWidth>
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={category}
+                label="Category"
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <MenuItem value="">Select Category</MenuItem>
+                <MenuItem value="Sustainability">Sustainability</MenuItem>
+                <MenuItem value="Technology">Technology</MenuItem>
+                <MenuItem value="Economy">Economy</MenuItem>
+                <MenuItem value="Leadership">Leadership</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* METADATA */}
+          <Box mt={3}>
+            <TextField fullWidth label="Title" sx={{ mb: 2 }} />
+            <TextField fullWidth label="Description" multiline rows={3} />
+          </Box>
+
+          {/* 🚀 ACTIONS */}
+          <Box mt={3} display="flex" gap={2}>
+            <Button variant="contained" fullWidth>
+              Upload
+            </Button>
+
+            <Button
+              variant="outlined"
+              fullWidth
+              onClick={() => {
+                setFile(null);
+                setPreview(null);
+                setThumbnail(null);
+                setThumbPreview(null);
+                setMenu("");
+                setCategory("");
+                setProgress(0);
+              }}
+            >
+              Cancel
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </Box>
   );
 }

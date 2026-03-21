@@ -15,6 +15,7 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
+import UserPopup from '../view/user-popup';
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
@@ -30,6 +31,7 @@ export function UserView() {
   const table = useTable();
 
   const [filterName, setFilterName] = useState('');
+  const [newUserData, setNewUserData] = useState(false);
 
   const dataFiltered: UserProps[] = applyFilter({
     inputData: _users,
@@ -38,6 +40,8 @@ export function UserView() {
   });
 
   const notFound = !dataFiltered.length && !!filterName;
+
+
 
   return (
     <DashboardContent>
@@ -54,6 +58,7 @@ export function UserView() {
         <Button
           variant="contained"
           color="inherit"
+          onClick={() => { setNewUserData(true) }}
           startIcon={<Iconify icon="mingcute:add-line" />}
         >
           New user
@@ -87,7 +92,7 @@ export function UserView() {
                 }
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'company', label: 'Company' },
+                  // { id: 'company', label: 'Company' },
                   { id: 'role', label: 'Role' },
                   { id: 'isVerified', label: 'Verified', align: 'center' },
                   { id: 'status', label: 'Status' },
@@ -130,6 +135,11 @@ export function UserView() {
           onRowsPerPageChange={table.onChangeRowsPerPage}
         />
       </Card>
+      {newUserData ? <UserPopup
+        open={newUserData}
+        onClose={() => setNewUserData(false)}
+        onSave={() => { }}
+      /> : <div />}
     </DashboardContent>
   );
 }

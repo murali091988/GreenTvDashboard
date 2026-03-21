@@ -205,7 +205,26 @@ export const _taskNames = (index: number) =>
 
 export const _productNames = (index: number) =>
   [
-    'Nike Air Force 1 NDESTRUKT',
+    'A Call from the Earth: Opportunities',
+    'Artificial Intelligence: A Great Enabler Towards Sustainable Development',
+    'Digital Disruption: Case Studies & Cyber Hygiene',
+    'Understanding Market Dynamics: Examples and Insights',
+    'Finance is Not Just Profit: It is Responsibility',
+    'Financial Markets: About Meaning, Not Just Money',
+    'Funding Opportunities for Sustainable Technologies',
+    'Global Markets vs India: A Performing Economic Eminence',
+    'Governance & Risk Management are Integral',
+    'Creating Opportunities in the New World Order',
+    'From Waste to Value: Opportunities Unveiled',
+    'Opportunities in Climate Risk Management Start-ups',
+    'Opportunities in Sustainable Development',
+    'Recycling Opportunities: Good Business',
+    'Waste to Value: Business Opportunities in Dubai'
+  ][index];
+
+  export const _productDescription = (index: number) =>
+  [
+    'Exploring the urgent opportunities presented by our planets environmental challenges. Discover how we can transform Earths call to action into sustainable business ventures and meaningful impact.',
     'Nike Space Hippie 04',
     'Nike Air Zoom Pegasus 37 A.I.R. Chaz Bear',
     'Nike Blazer Low 77 Vintage',

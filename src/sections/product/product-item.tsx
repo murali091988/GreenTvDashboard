@@ -14,6 +14,7 @@ import { ColorPreview } from 'src/components/color-utils';
 export type ProductItemProps = {
   id: string;
   name: string;
+  description: string;
   price: number;
   status: string;
   coverUrl: string;
@@ -82,7 +83,10 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
           {product.name}
         </Link>
 
-        <Box
+        <Link color="inherit" underline="hover" variant="subtitle2" noWrap>
+          {product.description}
+        </Link>
+        {/* <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -91,7 +95,7 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
         >
           <ColorPreview colors={product.colors} />
           {renderPrice}
-        </Box>
+        </Box> */}
       </Stack>
     </Card>
   );

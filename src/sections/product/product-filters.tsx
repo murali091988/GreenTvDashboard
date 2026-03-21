@@ -219,10 +219,10 @@ export function ProductFilters({
 
         <Scrollbar>
           <Stack spacing={3} sx={{ p: 3 }}>
-            {renderGender}
+            {/* {renderGender} */}
             {renderCategory}
-            {renderColors}
-            {renderPrice}
+            {/* {renderColors} */}
+            {/* {renderPrice} */}
             {renderRating}
           </Stack>
         </Scrollbar>

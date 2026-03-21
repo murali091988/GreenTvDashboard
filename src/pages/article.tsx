@@ -1,15 +1,16 @@
 import { CONFIG } from 'src/config-global';
 
-import { ProductsView } from 'src/sections/product/view';
+import ArticleDashboard from 'src/sections/article/view/articleDashboard';
+
 
 // ----------------------------------------------------------------------
 
 export default function Page() {
   return (
     <>
-      <title>{`Upload Media - ${CONFIG.appName}`}</title>
+      <title>{`Article - ${CONFIG.appName}`}</title>
 
-      <ProductsView />
+      <ArticleDashboard />
     </>
   );
 }
