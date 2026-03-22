@@ -112,7 +112,7 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
 
   return (
     <>
-      {/* <Logo /> */}
+      <Logo />
 
       {slots?.topArea}
 
@@ -158,12 +158,21 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
                         fontWeight: 'fontWeightMedium',
                         color: theme.vars.palette.text.secondary,
                         minHeight: 44,
+
+                        // ✅ Hover style
+                        '&:hover': {
+                          backgroundColor: '#5cb039',   // green background
+                          color: '#fff',                // white text
+                        },
+
                         ...(isActived && {
                           fontWeight: 'fontWeightSemiBold',
-                          color: theme.vars.palette.primary.main,
-                          bgcolor: varAlpha(theme.vars.palette.primary.mainChannel, 0.08),
+                          color: '#5cb039',
+                          bgcolor: 'rgba(92, 176, 57, 0.08)',
+
                           '&:hover': {
-                            bgcolor: varAlpha(theme.vars.palette.primary.mainChannel, 0.16),
+                            backgroundColor: '#5cb039', // keep same hover
+                            color: '#fff',
                           },
                         }),
                       }),
