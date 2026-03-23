@@ -158,7 +158,7 @@ export default function NewArticleModal({ open, onClose }: Props) {
                             <Box
                                 onClick={() => fileRef.current?.click()}
                                 sx={{
-                                    border: "2px dashed #6366f1",
+                                    border: "2px dashed #5cb039",
                                     borderRadius: 2,
                                     p: 3,
                                     textAlign: "center",
